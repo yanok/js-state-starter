@@ -1,0 +1,45 @@
+name:                js-starter
+version:             0.1.0.0
+github:              "usi-pl/js-starter"
+license:             BSD3
+author:              "Nate Nystrom"
+maintainer:          "nate.nystrom@usi.ch"
+copyright:           "Copyright 2017 - Nate Nystrom"
+
+extra-source-files:
+- README.md
+- ChangeLog.md
+
+# Metadata used when publishing your package
+# synopsis:            Short description of your package
+# category:            Web
+
+# To avoid duplicated efforts in documentation and dealing with the
+# complications of embedding Haddock markup inside cabal files, it is
+# common to point users to the README.md file.
+description:         Please see the README on Github at <https://github.com/nystrom/js-starter#readme>
+
+dependencies:
+- base >= 4.7 && < 5
+- language-javascript >= 0.6
+- haskeline >= 0.7
+- mtl
+
+executables:
+  jsexp:
+    main:                Eval
+    other-modules:       JS
+    source-dirs:         src
+    ghc-options:
+    - -threaded
+    - -rtsopts
+    - -with-rtsopts=-N
+
+  jsexpS:
+    main:                EvalS
+    other-modules:       JS
+    source-dirs:         src
+    ghc-options:
+    - -threaded
+    - -rtsopts
+    - -with-rtsopts=-N

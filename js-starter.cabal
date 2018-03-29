@@ -1,0 +1,54 @@
+-- This file has been generated from package.yaml by hpack version 0.20.0.
+--
+-- see: https://github.com/sol/hpack
+--
+-- hash: 6938db2d792b7ae32bf33da73a5870e71634703654fd345eb73655d2ff45a29d
+
+name:           js-starter
+version:        0.1.0.0
+description:    Please see the README on Github at <https://github.com/nystrom/js-starter#readme>
+homepage:       https://github.com/usi-pl/js-starter#readme
+bug-reports:    https://github.com/usi-pl/js-starter/issues
+author:         Nate Nystrom
+maintainer:     nate.nystrom@usi.ch
+copyright:      Copyright 2017 - Nate Nystrom
+license:        BSD3
+license-file:   LICENSE
+build-type:     Simple
+cabal-version:  >= 1.10
+
+extra-source-files:
+    ChangeLog.md
+    README.md
+
+source-repository head
+  type: git
+  location: https://github.com/usi-pl/js-starter
+
+executable jsexp
+  main-is: Eval.hs
+  hs-source-dirs:
+      src
+  ghc-options: -threaded -rtsopts -with-rtsopts=-N -main-is Eval
+  build-depends:
+      base >=4.7 && <5
+    , haskeline >=0.7
+    , language-javascript >=0.6
+    , mtl
+  other-modules:
+      JS
+  default-language: Haskell2010
+
+executable jsexpS
+  main-is: EvalS.hs
+  hs-source-dirs:
+      src
+  ghc-options: -threaded -rtsopts -with-rtsopts=-N -main-is EvalS
+  build-depends:
+      base >=4.7 && <5
+    , haskeline >=0.7
+    , language-javascript >=0.6
+    , mtl
+  other-modules:
+      JS
+  default-language: Haskell2010
