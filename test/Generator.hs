@@ -11,12 +11,20 @@ import qualified Hedgehog.Range      as Range
 
 import           JS
 
+genNumVal :: MonadGen m => m Val
+genNumVal = VNum <$> Gen.frequency
+  [ (3, (* 100) <$> Gen.double (Range.exponentialFloat (-10) 10))
+  , (7, fromIntegral <$> Gen.integral (Range.linear (-10000) 10000))
+  ]
+
+genBoolVal :: MonadGen m => m Val
+genBoolVal = VBool <$> Gen.bool
+
 genVal :: MonadGen m => m Val
 genVal = Gen.frequency
-  [ (3, VNum <$> (* 100) <$> Gen.double (Range.exponentialFloat (-10) 10))
-  , (7, VNum <$> fromIntegral <$> Gen.integral (Range.linear (-10000) 10000))
-  , (5, VBool <$> Gen.bool)
-  , (2, return VUndefined)
+  [ (15, genNumVal)
+  , (10, genBoolVal)
+  , (1, return VUndefined)
   , (1, return $ VNum (0/0)) -- NaN
   , (1, return $ VNum (1/0)) -- +Infinity
   , (1, return $ VNum (-1/0)) -- -Infinity
@@ -33,14 +41,16 @@ isShortCircuit And = True
 isShortCircuit Or = True
 isShortCircuit _ = False
 
+genLeaf :: MonadGen m => Set String -> m Val -> m Exp
+genLeaf vs vg
+  | Set.null vs = Lit <$> vg
+  | otherwise   = Gen.choice [ Lit <$> vg, Var <$> Gen.element (Set.toList vs)]
+
 genExp' :: MonadGen m => StateT (Set String) m Exp
 genExp' = do
   vs <- get
   Gen.recursive Gen.choice
-    (if Set.null vs
-     then [ Lit <$> genVal ]
-     else [ Lit <$> genVal
-          , Var <$> Gen.element (Set.toList vs)])
+    [ genLeaf vs genVal ]
     [ Unary <$> Gen.enumBounded <*> genExp'
     , do
         op <- Gen.enumBounded
@@ -64,3 +74,26 @@ genExp' = do
         return $ Assign v e
     , Seq <$> genExp' <*> genExp'
     ]
+
+genArithExp :: MonadGen m => Set String -> m Exp
+genArithExp vs = Gen.recursive Gen.choice
+  [ genLeaf vs genNumVal ]
+  [ Gen.subterm2 (genArithExp vs) (genArithExp vs) (Bin Add)
+  , Gen.subterm2 (genArithExp vs) (genArithExp vs) (Bin Sub)
+  , Gen.subterm2 (genArithExp vs) (genArithExp vs) (Bin Mul)
+  , Gen.subterm2 (genArithExp vs) (genArithExp vs) (Bin Div)
+  , Gen.subterm2 (genArithExp vs) (genArithExp vs) (Bin Mod)
+  ]
+
+genSeqExp' :: MonadGen m => Set String -> (Set String -> m Exp) -> m Exp
+genSeqExp' vs base = Gen.recursive Gen.choice
+  [ base vs ]
+  [ do
+      v <- genVarName
+      e <- base vs
+      rest <- genSeqExp' (Set.insert v vs) base
+      return $ Seq e rest
+  ]
+
+genSeqArith :: MonadGen m => m Exp
+genSeqArith = genSeqExp' Set.empty genArithExp

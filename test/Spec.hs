@@ -1,17 +1,22 @@
 module Spec where
 
 import           Control.Monad
-import           Hedgehog      (check, evalIO, forAll, property, (===))
+import           Hedgehog      (Gen, Property, check, evalIO, forAll,
+                                property, (===))
 
 import           Eval          (eval)
 import           Generator
 import           JS
 import           Run
 
-
-main :: IO ()
-main = void $ check $ property $ do
-  e <- forAll genExp
+agreesWithNode :: Gen Exp -> Property
+agreesWithNode gen = property $ do
+  e <- forAll gen
   Right vN <- evalIO $ runInNode e
   let (v, _) = eval e []
   v === vN
+
+main :: IO ()
+main = do
+  void $ check $ agreesWithNode genSeqArith
+  void $ check $ agreesWithNode genExp
