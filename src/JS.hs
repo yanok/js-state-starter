@@ -112,4 +112,6 @@ instance Show Exp where
 
 paren :: Exp -> String
 paren e @ (Bin _ _ _) = "(" ++ show e ++ ")"
+paren e@Assign{} = "(" ++ show e ++ ")"
+paren e@Seq{} = "(" ++ show e ++ ")"
 paren e @ _           = show e
