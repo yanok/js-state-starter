@@ -5,9 +5,9 @@ import Language.JavaScript.Parser.Parser
 import Language.JavaScript.Parser.AST
 
 data Op = Add | Sub | Mul | Div | Mod | Gt | Lt | Eq | Le | Ge | And | Or | SEq | Ne | SNe
-  deriving (Show, Eq)
+  deriving (Show, Eq, Enum, Bounded)
 
-data UOp = Plus | Minus | Not deriving (Show, Eq)
+data UOp = Plus | Minus | Not deriving (Show, Eq, Enum, Bounded)
 
 data Exp = Unary UOp Exp         {- A unary operation -}
          | Bin Op Exp Exp        {- A binary operation -}
