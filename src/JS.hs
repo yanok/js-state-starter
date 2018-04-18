@@ -109,7 +109,7 @@ instance Show Exp where
   show (Unary Not e) = "!" ++ (paren e)
   show (Var x) = x
   show (Assign x e) = x ++ " = " ++ show e
-  show (Seq e1 e2) = show e1 ++ "; " ++ show e2
+  show (Seq e1 e2) = show e1 ++ ", " ++ show e2
 
 paren :: Exp -> String
 paren e @ (Bin _ _ _) = "(" ++ show e ++ ")"
