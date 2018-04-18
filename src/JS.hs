@@ -103,6 +103,7 @@ instance Show Exp where
   show (Cond c t e) = (paren c) ++ " ? " ++ (paren t) ++ " : " ++ (paren e)
   show (Unary Plus (Unary Plus e)) = "+(+" ++ paren e ++ ")"
   show (Unary Minus (Unary Minus e)) = "-(-" ++ paren e ++ ")"
+  show (Unary Minus (Lit (VNum n))) | n < 0 = "-(" ++ show n ++ ")"
   show (Unary Plus e) = "+" ++ (paren e)
   show (Unary Minus e) = "-" ++ (paren e)
   show (Unary Not e) = "!" ++ (paren e)
