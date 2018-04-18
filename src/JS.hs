@@ -101,6 +101,8 @@ instance Show Exp where
   show e @ (Bin SEq e1 e2) = (paren e1) ++ " === " ++ (paren e2)
   show e @ (Bin SNe e1 e2) = (paren e1) ++ " !== " ++ (paren e2)
   show (Cond c t e) = (paren c) ++ " ? " ++ (paren t) ++ " : " ++ (paren e)
+  show (Unary Plus (Unary Plus e)) = "+(+" ++ paren e ++ ")"
+  show (Unary Minus (Unary Minus e)) = "-(-" ++ paren e ++ ")"
   show (Unary Plus e) = "+" ++ (paren e)
   show (Unary Minus e) = "-" ++ (paren e)
   show (Unary Not e) = "!" ++ (paren e)
