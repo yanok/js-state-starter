@@ -2,7 +2,7 @@
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 6938db2d792b7ae32bf33da73a5870e71634703654fd345eb73655d2ff45a29d
+-- hash: 4e956a0bbc7bf6ef2c6c479d046e0ead41408d1015158f2ef77cd2f0bcd14c2f
 
 name:           js-starter
 version:        0.1.0.0
@@ -51,4 +51,23 @@ executable jsexpS
     , mtl
   other-modules:
       JS
+  default-language: Haskell2010
+
+test-suite jsexp-spec
+  type: exitcode-stdio-1.0
+  main-is: Spec.hs
+  hs-source-dirs:
+      src
+      test
+  ghc-options: -main-is Spec
+  build-depends:
+      base >=4.7 && <5
+    , containers
+    , haskeline >=0.7
+    , hedgehog
+    , language-javascript >=0.6
+    , mtl
+    , process
+  other-modules:
+      Run, Generator, Eval, JS
   default-language: Haskell2010

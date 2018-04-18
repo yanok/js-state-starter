@@ -43,3 +43,15 @@ executables:
     - -threaded
     - -rtsopts
     - -with-rtsopts=-N
+
+tests:
+  jsexp-spec:
+    main:                Spec
+    other-modules:       Run, Generator, Eval, JS
+    source-dirs:
+    - src
+    - test
+    dependencies:
+    - hedgehog
+    - containers
+    - process
