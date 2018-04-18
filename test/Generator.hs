@@ -28,6 +28,11 @@ genVarName = Gen.string (Range.linear 1 10) Gen.alpha
 genExp :: MonadGen m => m Exp
 genExp = evalStateT genExp' Set.empty
 
+isShortCircuit :: Op -> Bool
+isShortCircuit And = True
+isShortCircuit Or = True
+isShortCircuit _ = False
+
 genExp' :: MonadGen m => StateT (Set String) m Exp
 genExp' = do
   vs <- get
@@ -37,7 +42,13 @@ genExp' = do
      else [ Lit <$> genVal
           , Var <$> Gen.element (Set.toList vs)])
     [ Unary <$> Gen.enumBounded <*> genExp'
-    , Bin <$> Gen.enumBounded <*> genExp' <*> genExp'
+    , do
+        op <- Gen.enumBounded
+        e1 <- genExp'
+        old <- get
+        e2 <- genExp'
+        when (isShortCircuit op) $ put old
+        return $ Bin op e1 e2
     , do
         c <- genExp'
         old <- get
