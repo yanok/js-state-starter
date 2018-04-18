@@ -16,10 +16,10 @@ genVal = Gen.frequency
   [ (3, VNum <$> Gen.double (Range.exponentialFloat (-1000) 1000))
   , (7, VNum <$> fromIntegral <$> Gen.integral (Range.linear (-1000) 1000))
   , (5, VBool <$> Gen.bool)
-  -- , (2, return VUndefined)
-  -- , (1, return $ VNum (0/0)) -- NaN
-  -- , (1, return $ VNum (1/0)) -- +Infinity
-  -- , (1, return $ VNum (-1/0)) -- -Infinity
+  , (2, return VUndefined)
+  , (1, return $ VNum (0/0)) -- NaN
+  , (1, return $ VNum (1/0)) -- +Infinity
+  , (1, return $ VNum (-1/0)) -- -Infinity
   ]
 
 genVarName :: MonadGen m => m String
