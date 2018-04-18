@@ -38,7 +38,14 @@ genExp' = do
           , Var <$> Gen.element (Set.toList vs)])
     [ Unary <$> Gen.enumBounded <*> genExp'
     , Bin <$> Gen.enumBounded <*> genExp' <*> genExp'
-    , Cond <$> genExp' <*> genExp' <*> genExp'
+    , do
+        c <- genExp'
+        old <- get
+        e1 <- genExp'
+        put old
+        e2 <- genExp'
+        put old
+        return $ Cond c e1 e2
     , do
         v <- genVarName
         e <- genExp'
