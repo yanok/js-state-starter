@@ -18,7 +18,13 @@ data Exp = Unary UOp Exp         {- A unary operation -}
          | Seq Exp Exp           {- e1; e2 -}
 
 data Val = VNum Double | VBool Bool | VUndefined
-  deriving Eq
+
+instance Eq Val where
+  VNum n == VNum m | isNaN n && isNaN m = True
+                   | otherwise          = n == m
+  VBool b1 == VBool b2 = b1 == b2
+  VUndefined == VUndefined = True
+  _ == _ = False
 
 type Store = [(String,Val)]
 
