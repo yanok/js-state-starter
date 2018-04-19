@@ -92,7 +92,7 @@ genSeqExp' vs base = Gen.recursive Gen.choice
       v <- genVarName
       e <- base vs
       rest <- genSeqExp' (Set.insert v vs) base
-      return $ Seq e rest
+      return $ Seq (Assign v e) rest
   ]
 
 genSeqArith :: MonadGen m => m Exp
