@@ -23,8 +23,10 @@ isCloseEnough :: Double -> Double -> Bool
 isCloseEnough x y = abs (x - y) / x < 0.00000001
 
 instance Eq Val where
-  VNum n == VNum m | isNaN n && isNaN m = True
-                   | otherwise          = isCloseEnough n m
+  VNum n == VNum m | isNaN n      = isNaN m
+                   | isInfinite n = isInfinite m && signum n == signum m
+                   | abs n == 0   = n == m
+                   | otherwise    = isCloseEnough n m
   VBool b1 == VBool b2 = b1 == b2
   VUndefined == VUndefined = True
   _ == _ = False
