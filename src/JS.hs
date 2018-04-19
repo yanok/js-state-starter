@@ -20,7 +20,7 @@ data Exp = Unary UOp Exp         {- A unary operation -}
 data Val = VNum Double | VBool Bool | VUndefined
 
 isCloseEnough :: Double -> Double -> Bool
-isCloseEnough x y = abs (x - y) / x < 0.00000001
+isCloseEnough x y = abs (x - y) / x < 0.001
 
 instance Eq Val where
   VNum n == VNum m | isNaN n      = isNaN m
