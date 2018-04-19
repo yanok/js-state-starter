@@ -1,22 +1,32 @@
+{-# LANGUAGE OverloadedStrings #-}
 module Spec where
 
 import           Control.Monad
-import           Hedgehog      (Gen, Property, check, evalIO, forAll,
-                                property, (===))
+import           Data.String
+import           Hedgehog      (Gen, Group (..), Property, check,
+                                checkSequential, evalIO, forAll, property,
+                                (===))
 
-import           Eval          (eval)
+import qualified Eval
 import           Generator
 import           JS
 import           Run
 
-agreesWithNode :: Gen Exp -> Property
-agreesWithNode gen = property $ do
+eval :: Exp -> Val
+eval e = fst $ Eval.eval e []
+
+agreesWithNode :: (Exp -> Val) -> Gen Exp -> Property
+agreesWithNode ev gen = property $ do
   e <- forAll gen
   Right vN <- evalIO $ runInNode e
-  let (v, _) = eval e []
-  v === vN
+  ev e === vN
+
+testsForImplementation :: String -> (Exp -> Val) -> Group
+testsForImplementation name ev = Group (fromString name)
+  [ ("arith-only expression with no inline assignment", agreesWithNode ev genSeqArith)
+  , ("general expressions", agreesWithNode ev genExp)
+  ]
 
 main :: IO ()
 main = do
-  void $ check $ agreesWithNode genSeqArith
-  void $ check $ agreesWithNode genExp
+  void $ checkSequential $ testsForImplementation "eval" eval
