@@ -13,7 +13,7 @@ import           JS
 
 genNumVal :: MonadGen m => m Val
 genNumVal = VNum <$> Gen.frequency
-  [ (3, (* 100) <$> Gen.double (Range.exponentialFloat (-10) 10))
+  [ (3, (* 1000) <$> Gen.double (Range.exponentialFloat (-1) 1))
   , (7, fromIntegral <$> Gen.integral (Range.linear (-10000) 10000))
   ]
 
