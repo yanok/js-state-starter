@@ -7,8 +7,9 @@ import           Control.Monad
 import           Control.Monad.State
 import           Data.String
 import           Hedgehog            (Gen, Group (..), Property, check,
-                                      checkSequential, evalIO, failure, forAll,
-                                      property, success, (===))
+                                      checkSequential, evalEither, evalIO,
+                                      failure, forAll, property, success, (===))
+import qualified Hedgehog            as H
 
 import qualified Eval
 import qualified EvalS
@@ -25,8 +26,10 @@ evalS e = evalState (EvalS.evalS e) []
 agreesWithNode :: (Exp -> Val) -> Gen Exp -> Property
 agreesWithNode ev gen = property $ do
   e <- forAll gen
-  Right vN <- evalIO $ runInNode e
-  ev e === vN
+  rN <- evalIO $ runInNode e
+  vN <- evalEither rN
+  v <- H.eval $ ev e
+  v === vN
 
 detectsBadVar :: (Exp -> Val) -> Gen Exp -> Property
 detectsBadVar ev gen = property $ do
