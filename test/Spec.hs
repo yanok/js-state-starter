@@ -1,6 +1,7 @@
 {-# LANGUAGE OverloadedStrings #-}
 module Spec where
 
+import           Control.DeepSeq
 import           Control.Exception
 import           Control.Monad
 import           Control.Monad.State
@@ -30,7 +31,7 @@ agreesWithNode ev gen = property $ do
 detectsBadVar :: (Exp -> Val) -> Property
 detectsBadVar ev = property $ do
   e <- forAll genBadExp
-  r <- liftIO $ try $ evaluate $ ev e
+  r <- liftIO $ try $ evaluate $ force $ ev e
   case r :: Either SomeException Val of
     Left _ -> success
     Right _ -> failure
