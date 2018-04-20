@@ -31,7 +31,7 @@ genVal = Gen.frequency
   ]
 
 genVarName :: MonadGen m => m String
-genVarName = Gen.string (Range.linear 1 10) Gen.alpha
+genVarName = ("var" ++) <$> Gen.string (Range.linear 1 10) Gen.alpha
 
 genExp :: MonadGen m => m Exp
 genExp = evalStateT genExp' Set.empty
