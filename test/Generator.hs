@@ -79,18 +79,18 @@ genExp' = do
 genArithExpNoMod :: MonadGen m => Set String -> m Exp
 genArithExpNoMod vs = Gen.recursive Gen.choice
   [ genLeaf vs genNumVal ]
-  [ Gen.subterm2 (genArithExp vs) (genArithExp vs) (Bin Add)
-  , Gen.subterm2 (genArithExp vs) (genArithExp vs) (Bin Sub)
-  , Gen.subterm2 (genArithExp vs) (genArithExp vs) (Bin Mul)
-  , Gen.subterm2 (genArithExp vs) (genArithExp vs) (Bin Div)
+  [ Gen.subterm2 (genArithExpNoMod vs) (genArithExpNoMod vs) (Bin Add)
+  , Gen.subterm2 (genArithExpNoMod vs) (genArithExpNoMod vs) (Bin Sub)
+  , Gen.subterm2 (genArithExpNoMod vs) (genArithExpNoMod vs) (Bin Mul)
+  , Gen.subterm2 (genArithExpNoMod vs) (genArithExpNoMod vs) (Bin Div)
   ]
 
 genArithExpNoDiv :: MonadGen m => Set String -> m Exp
 genArithExpNoDiv vs = Gen.recursive Gen.choice
   [ genLeaf vs genNumVal ]
-  [ Gen.subterm2 (genArithExp vs) (genArithExp vs) (Bin Add)
-  , Gen.subterm2 (genArithExp vs) (genArithExp vs) (Bin Sub)
-  , Gen.subterm2 (genArithExp vs) (genArithExp vs) (Bin Mul)
+  [ Gen.subterm2 (genArithExpNoDiv vs) (genArithExpNoDiv vs) (Bin Add)
+  , Gen.subterm2 (genArithExpNoDiv vs) (genArithExpNoDiv vs) (Bin Sub)
+  , Gen.subterm2 (genArithExpNoDiv vs) (genArithExpNoDiv vs) (Bin Mul)
   ]
 
 genArithExp :: MonadGen m => Set String -> m Exp

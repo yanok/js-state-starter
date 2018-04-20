@@ -28,11 +28,11 @@ agreesWithNode ev gen = property $ do
 
 testsForImplementation :: String -> (Exp -> Val) -> Group
 testsForImplementation name ev = Group (fromString name)
-  [ ("arith-only expression with no inline assignment", agreesWithNode ev genSeqArith)
-  , ( "simple arith expression (no division) with no inline assignment"
+  [ ( "simple arith expression (no division) with no inline assignment"
     , agreesWithNode ev genSeqArithNoDiv)
   , ( "simple arith expression (no modulo) with no inline assignment"
     , agreesWithNode ev genSeqArithNoMod)
+  , ("arith-only expression with no inline assignment", agreesWithNode ev genSeqArith)
   , ("general expressions", agreesWithNode ev genExp)
   ]
 
