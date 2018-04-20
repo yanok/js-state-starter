@@ -47,7 +47,7 @@ executables:
 tests:
   jsexp-spec:
     main:                Spec
-    other-modules:       Run, Generator, Eval, JS
+    other-modules:       Run, Generator, Eval, EvalS, JS
     source-dirs:
     - src
     - test
