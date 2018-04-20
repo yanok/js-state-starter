@@ -24,6 +24,8 @@ agreesWithNode ev gen = property $ do
 testsForImplementation :: String -> (Exp -> Val) -> Group
 testsForImplementation name ev = Group (fromString name)
   [ ("arith-only expression with no inline assignment", agreesWithNode ev genSeqArith)
+  , ( "simple arith expression with no inline assignment"
+    , agreesWithNode ev genSeqSimpleArith)
   , ("general expressions", agreesWithNode ev genExp)
   ]
 

@@ -75,6 +75,16 @@ genExp' = do
     , Seq <$> genExp' <*> genExp'
     ]
 
+-- same as Arith but without Mod
+genSimpleArithExp :: MonadGen m => Set String -> m Exp
+genSimpleArithExp vs = Gen.recursive Gen.choice
+  [ genLeaf vs genNumVal ]
+  [ Gen.subterm2 (genArithExp vs) (genArithExp vs) (Bin Add)
+  , Gen.subterm2 (genArithExp vs) (genArithExp vs) (Bin Sub)
+  , Gen.subterm2 (genArithExp vs) (genArithExp vs) (Bin Mul)
+  , Gen.subterm2 (genArithExp vs) (genArithExp vs) (Bin Div)
+  ]
+
 genArithExp :: MonadGen m => Set String -> m Exp
 genArithExp vs = Gen.recursive Gen.choice
   [ genLeaf vs genNumVal ]
@@ -97,3 +107,6 @@ genSeqExp' vs base = Gen.recursive Gen.choice
 
 genSeqArith :: MonadGen m => m Exp
 genSeqArith = genSeqExp' Set.empty genArithExp
+
+genSeqSimpleArith :: MonadGen m => m Exp
+genSeqSimpleArith = genSeqExp' Set.empty genSimpleArithExp
