@@ -24,6 +24,7 @@ dependencies:
 - language-javascript >= 0.6
 - haskeline >= 0.7
 - mtl
+- deepseq
 
 executables:
   jsexp:
@@ -55,3 +56,4 @@ tests:
     - hedgehog
     - containers
     - process
+    - deepseq
