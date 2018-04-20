@@ -28,9 +28,9 @@ agreesWithNode ev gen = property $ do
   Right vN <- evalIO $ runInNode e
   ev e === vN
 
-detectsBadVar :: (Exp -> Val) -> Property
-detectsBadVar ev = property $ do
-  e <- forAll genBadExp
+detectsBadVar :: (Exp -> Val) -> Gen Exp -> Property
+detectsBadVar ev gen = property $ do
+  e <- forAll gen
   r <- liftIO $ try $ evaluate $ force $ ev e
   case r :: Either SomeException Val of
     Left _ -> success
@@ -44,7 +44,8 @@ testsForImplementation name ev = Group (fromString name)
     , agreesWithNode ev genSeqArithNoMod)
   , ("arith-only expression with no inline assignment", agreesWithNode ev genSeqArith)
   , ("general expressions", agreesWithNode ev genExp)
-  , ("detects undefined variable", detectsBadVar ev)
+  , ("detects used undefined variable", detectsBadVar ev genSeqBadVar)
+  , ("detects undefined variable (even unused)", detectsBadVar ev genBadExp)
   ]
 
 main :: IO ()

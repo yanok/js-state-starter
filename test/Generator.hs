@@ -131,6 +131,23 @@ genBadExp' = do
     , Seq <$> genExp' <*> genBadExp'
     ]
 
+genSimpleBadExp :: MonadGen m => String -> Set String -> m Exp
+genSimpleBadExp bad vs = do
+  Gen.recursive Gen.choice
+    [ return $ Var bad ]
+    [ Unary <$> Gen.enumBounded <*> genSimpleBadExp bad vs
+    , do
+        op <- Gen.enumBounded
+        e1 <- genSimpleBadExp bad vs
+        e2 <- genArithExp vs
+        return $ Bin op e1 e2
+    , do
+        c <- genSimpleBadExp bad vs
+        e1 <- genArithExp vs
+        e2 <- genArithExp vs
+        return $ Cond c e1 e2
+    ]
+
 -- same as Arith but without Mod
 genArithExpNoMod :: MonadGen m => Set String -> m Exp
 genArithExpNoMod vs = Gen.recursive Gen.choice
@@ -159,21 +176,45 @@ genArithExp vs = Gen.recursive Gen.choice
   , Gen.subterm2 (genArithExp vs) (genArithExp vs) (Bin Mod)
   ]
 
-genSeqExp' :: MonadGen m => Set String -> (Set String -> m Exp) -> m Exp
-genSeqExp' vs base = Gen.recursive Gen.choice
+genSeqExp :: MonadGen m => Set String -> (Set String -> m Exp) -> m Exp
+genSeqExp vs base = Gen.recursive Gen.choice
   [ base vs ]
   [ do
       v <- genVarName
       e <- base vs
-      rest <- genSeqExp' (Set.insert v vs) base
+      rest <- genSeqExp (Set.insert v vs) base
+      return $ Seq (Assign v e) rest
+  ]
+
+genSeqExpErr
+    :: MonadGen m
+    => String
+    -> Set String
+    -> (String -> Set String -> m Exp)
+    -> (Set String -> m Exp)
+    -> m Exp
+genSeqExpErr init vs bad good = Gen.recursive Gen.choice
+  [ bad init vs ]
+  [ do
+      v <- genVarName
+      e <- bad init vs
+      rest <- genSeqExpErr v vs bad good
+      return $ Seq (Assign v e) rest
+  , do
+      v <- genVarName
+      e <- good vs
+      rest <- genSeqExpErr init (Set.insert v vs) bad good
       return $ Seq (Assign v e) rest
   ]
 
 genSeqArith :: MonadGen m => m Exp
-genSeqArith = genSeqExp' Set.empty genArithExp
+genSeqArith = genSeqExp Set.empty genArithExp
 
 genSeqArithNoMod :: MonadGen m => m Exp
-genSeqArithNoMod = genSeqExp' Set.empty genArithExpNoMod
+genSeqArithNoMod = genSeqExp Set.empty genArithExpNoMod
 
 genSeqArithNoDiv :: MonadGen m => m Exp
-genSeqArithNoDiv = genSeqExp' Set.empty genArithExpNoDiv
+genSeqArithNoDiv = genSeqExp Set.empty genArithExpNoDiv
+
+genSeqBadVar :: MonadGen m => m Exp
+genSeqBadVar = genSeqExpErr "bad_var" Set.empty genSimpleBadExp genArithExp
