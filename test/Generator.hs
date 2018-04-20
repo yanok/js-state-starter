@@ -179,16 +179,16 @@ genArithExp vs = Gen.recursive Gen.choice
 genArithBadExp :: MonadGen m => String -> Set String -> m Exp
 genArithBadExp v vs = Gen.recursive Gen.choice
   [ pure $ Var v ]
-  [ Gen.subterm2 (genArithBadExp v vs) (genArithExp vs) (Bin Add)
-  , Gen.subterm2 (genArithExp vs) (genArithBadExp v vs) (Bin Add)
-  , Gen.subterm2 (genArithBadExp v vs) (genArithExp vs) (Bin Sub)
-  , Gen.subterm2 (genArithExp vs) (genArithBadExp v vs) (Bin Sub)
-  , Gen.subterm2 (genArithBadExp v vs) (genArithExp vs) (Bin Mul)
-  , Gen.subterm2 (genArithExp vs) (genArithBadExp v vs) (Bin Mul)
-  , Gen.subterm2 (genArithBadExp v vs) (genArithExp vs) (Bin Div)
-  , Gen.subterm2 (genArithExp vs) (genArithBadExp v vs) (Bin Div)
-  , Gen.subterm2 (genArithBadExp v vs) (genArithExp vs) (Bin Mod)
-  , Gen.subterm2 (genArithExp vs) (genArithBadExp v vs) (Bin Mod)
+  [ Gen.subtermM (genArithBadExp v vs) (\x -> Bin Add <$> genArithExp vs <*> pure x)
+  , Gen.subtermM (genArithBadExp v vs) (\x -> Bin Add x <$> genArithExp vs)
+  , Gen.subtermM (genArithBadExp v vs) (\x -> Bin Sub <$> genArithExp vs <*> pure x)
+  , Gen.subtermM (genArithBadExp v vs) (\x -> Bin Sub x <$> genArithExp vs)
+  , Gen.subtermM (genArithBadExp v vs) (\x -> Bin Mul <$> genArithExp vs <*> pure x)
+  , Gen.subtermM (genArithBadExp v vs) (\x -> Bin Mul x <$> genArithExp vs)
+  , Gen.subtermM (genArithBadExp v vs) (\x -> Bin Div <$> genArithExp vs <*> pure x)
+  , Gen.subtermM (genArithBadExp v vs) (\x -> Bin Div x <$> genArithExp vs)
+  , Gen.subtermM (genArithBadExp v vs) (\x -> Bin Mod <$> genArithExp vs <*> pure x)
+  , Gen.subtermM (genArithBadExp v vs) (\x -> Bin Mod x <$> genArithExp vs)
   ]
 
 genSeqExp :: MonadGen m => Set String -> (Set String -> m Exp) -> m Exp
