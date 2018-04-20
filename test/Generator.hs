@@ -191,6 +191,23 @@ genArithBadExp v vs = Gen.recursive Gen.choice
   , Gen.subtermM (genArithBadExp v vs) (\x -> Bin Mod x <$> genArithExp vs)
   ]
 
+genArithBadExpNoDiv :: MonadGen m => String -> Set String -> m Exp
+genArithBadExpNoDiv v vs = Gen.recursive Gen.choice
+  [ pure $ Var v ]
+  [ Gen.subtermM (genArithBadExpNoDiv v vs)
+    (\x -> Bin Add <$> genArithExpNoDiv vs <*> pure x)
+  , Gen.subtermM (genArithBadExpNoDiv v vs)
+    (\x -> Bin Add x <$> genArithExpNoDiv vs)
+  , Gen.subtermM (genArithBadExpNoDiv v vs)
+    (\x -> Bin Sub <$> genArithExpNoDiv vs <*> pure x)
+  , Gen.subtermM (genArithBadExpNoDiv v vs)
+    (\x -> Bin Sub x <$> genArithExpNoDiv vs)
+  , Gen.subtermM (genArithBadExpNoDiv v vs)
+    (\x -> Bin Mul <$> genArithExpNoDiv vs <*> pure x)
+  , Gen.subtermM (genArithBadExpNoDiv v vs)
+    (\x -> Bin Mul x <$> genArithExpNoDiv vs)
+  ]
+
 genSeqExp :: MonadGen m => Set String -> (Set String -> m Exp) -> m Exp
 genSeqExp vs base = Gen.recursive Gen.choice
   [ base vs ]
@@ -236,3 +253,7 @@ genSeqBadVar = genSeqExpErr "bad_var" Set.empty genSimpleBadExp genArithExp
 
 genSeqBadArith :: MonadGen m => m Exp
 genSeqBadArith = genSeqExpErr "bad_var" Set.empty genArithBadExp genArithExp
+
+genSeqBadArithNoDiv :: MonadGen m => m Exp
+genSeqBadArithNoDiv
+  = genSeqExpErr "bad_var" Set.empty genArithBadExpNoDiv genArithExpNoDiv

@@ -45,6 +45,8 @@ testsForImplementation name ev = Group (fromString name)
   , ("arith-only expression with no inline assignment", agreesWithNode ev genSeqArith)
   , ("general expressions", agreesWithNode ev genExp)
   , ("detects used undefined variable in arith", detectsBadVar ev genSeqBadArith)
+  , ( "detects used undefined variable in arith (no division)"
+    , detectsBadVar ev genSeqBadArithNoDiv)
   , ("detects used undefined variable", detectsBadVar ev genSeqBadVar)
   , ("detects undefined variable (even unused)", detectsBadVar ev genBadExp)
   ]
