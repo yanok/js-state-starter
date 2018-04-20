@@ -91,13 +91,13 @@ genBadExp' = do
         e2 <- genExp'
         when (isShortCircuit op) $ put old
         return $ Bin op e1 e2
-    , do
-        op <- Gen.enumBounded
-        e1 <- genExp'
-        old <- get
-        e2 <- genBadExp'
-        when (isShortCircuit op) $ put old
-        return $ Bin op e1 e2
+    -- , do
+    --     op <- Gen.enumBounded
+    --     e1 <- genExp'
+    --     old <- get
+    --     e2 <- genBadExp'
+    --     when (isShortCircuit op) $ put old
+    --     return $ Bin op e1 e2
     , do
         c <- genBadExp'
         old <- get
@@ -106,22 +106,22 @@ genBadExp' = do
         e2 <- genExp'
         put old
         return $ Cond c e1 e2
-    , do
-        c <- genExp'
-        old <- get
-        e1 <- genBadExp'
-        put old
-        e2 <- genExp'
-        put old
-        return $ Cond c e1 e2
-    , do
-        c <- genExp'
-        old <- get
-        e1 <- genExp'
-        put old
-        e2 <- genBadExp'
-        put old
-        return $ Cond c e1 e2
+    -- , do
+    --     c <- genExp'
+    --     old <- get
+    --     e1 <- genBadExp'
+    --     put old
+    --     e2 <- genExp'
+    --     put old
+    --     return $ Cond c e1 e2
+    -- , do
+    --     c <- genExp'
+    --     old <- get
+    --     e1 <- genExp'
+    --     put old
+    --     e2 <- genBadExp'
+    --     put old
+    --     return $ Cond c e1 e2
     , do
         v <- genVarName
         e <- genBadExp'
