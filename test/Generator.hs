@@ -75,6 +75,62 @@ genExp' = do
     , Seq <$> genExp' <*> genExp'
     ]
 
+genBadExp :: MonadGen m => m Exp
+genBadExp = evalStateT genBadExp' Set.empty
+
+genBadExp' :: MonadGen m => StateT (Set String) m Exp
+genBadExp' = do
+  vs <- get
+  Gen.recursive Gen.choice
+    [ return $ Var "bad_var" ]
+    [ Unary <$> Gen.enumBounded <*> genBadExp'
+    , do
+        op <- Gen.enumBounded
+        e1 <- genBadExp'
+        old <- get
+        e2 <- genExp'
+        when (isShortCircuit op) $ put old
+        return $ Bin op e1 e2
+    , do
+        op <- Gen.enumBounded
+        e1 <- genExp'
+        old <- get
+        e2 <- genBadExp'
+        when (isShortCircuit op) $ put old
+        return $ Bin op e1 e2
+    , do
+        c <- genBadExp'
+        old <- get
+        e1 <- genExp'
+        put old
+        e2 <- genExp'
+        put old
+        return $ Cond c e1 e2
+    , do
+        c <- genExp'
+        old <- get
+        e1 <- genBadExp'
+        put old
+        e2 <- genExp'
+        put old
+        return $ Cond c e1 e2
+    , do
+        c <- genExp'
+        old <- get
+        e1 <- genExp'
+        put old
+        e2 <- genBadExp'
+        put old
+        return $ Cond c e1 e2
+    , do
+        v <- genVarName
+        e <- genBadExp'
+        put $ Set.insert v vs
+        return $ Assign v e
+    , Seq <$> genBadExp' <*> genExp'
+    , Seq <$> genExp' <*> genBadExp'
+    ]
+
 -- same as Arith but without Mod
 genArithExpNoMod :: MonadGen m => Set String -> m Exp
 genArithExpNoMod vs = Gen.recursive Gen.choice
