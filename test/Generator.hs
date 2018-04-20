@@ -216,7 +216,7 @@ genSeqExpErr init vs bad good = Gen.recursive Gen.choice
       rest <- genSeqExpErr v vs bad good
       return $ Seq (Assign v e) rest
   , do
-      v <- genVarName
+      v <- Gen.filter (/= init) genVarName
       e <- good vs
       rest <- genSeqExpErr init (Set.insert v vs) bad good
       return $ Seq (Assign v e) rest
