@@ -1,12 +1,13 @@
 {-# LANGUAGE OverloadedStrings #-}
 module Spec where
 
+import           Control.Exception
 import           Control.Monad
 import           Control.Monad.State
 import           Data.String
 import           Hedgehog            (Gen, Group (..), Property, check,
-                                      checkSequential, evalIO, forAll, property,
-                                      (===))
+                                      checkSequential, evalIO, failure, forAll,
+                                      property, success, (===))
 
 import qualified Eval
 import qualified EvalS
@@ -26,6 +27,14 @@ agreesWithNode ev gen = property $ do
   Right vN <- evalIO $ runInNode e
   ev e === vN
 
+detectsBadVar :: (Exp -> Val) -> Property
+detectsBadVar ev = property $ do
+  e <- forAll genBadExp
+  r <- liftIO $ try $ evaluate $ ev e
+  case r :: Either SomeException Val of
+    Left _ -> success
+    Right _ -> failure
+
 testsForImplementation :: String -> (Exp -> Val) -> Group
 testsForImplementation name ev = Group (fromString name)
   [ ( "simple arith expression (no division) with no inline assignment"
@@ -34,6 +43,7 @@ testsForImplementation name ev = Group (fromString name)
     , agreesWithNode ev genSeqArithNoMod)
   , ("arith-only expression with no inline assignment", agreesWithNode ev genSeqArith)
   , ("general expressions", agreesWithNode ev genExp)
+  , ("detects undefined variable", detectsBadVar ev)
   ]
 
 main :: IO ()
