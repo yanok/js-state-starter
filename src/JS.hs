@@ -71,6 +71,7 @@ parseJs (JSLiteral _ "false") = return $ Lit (VBool False)
 parseJs (JSIdentifier _ "undefined") = return $ Lit VUndefined
 parseJs (JSIdentifier _ x) = return $ Var x
 parseJs (JSAssignExpression (JSIdentifier _ x)  (JSAssign _) e) = do { t <- parseJs e; return $ Assign x t }
+parseJs (JSCommaExpression e1 _ e2) = Seq <$> parseJs e1 <*> parseJs e2
 parseJs (JSExpressionBinary e1 (JSBinOpAnd _) e2) = do { t1 <- parseJs e1; t2 <- parseJs e2; return $ Bin And t1 t2 }
 parseJs (JSExpressionBinary e1 (JSBinOpDivide _) e2) = do { t1 <- parseJs e1; t2 <- parseJs e2; return $ Bin Div t1 t2 }
 parseJs (JSExpressionBinary e1 (JSBinOpEq _) e2) = do { t1 <- parseJs e1; t2 <- parseJs e2; return $ Bin Eq t1 t2 }
