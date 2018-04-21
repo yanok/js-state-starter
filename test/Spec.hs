@@ -18,6 +18,7 @@ import           Run
 agreesWithNode :: (Exp -> Val) -> Gen Exp -> Property
 agreesWithNode ev gen = property $ do
   e <- forAll gen
+  H.annotate $ pretty e
   rN <- evalIO $ runInNode e
   vN <- evalEither rN
   v <- H.eval $ ev e
@@ -26,6 +27,7 @@ agreesWithNode ev gen = property $ do
 detectsBadVar :: (Exp -> Val) -> Gen Exp -> Property
 detectsBadVar ev gen = property $ do
   e <- forAll gen
+  H.annotate $ pretty e
   r <- evalIO $ try $ evaluate $ force $ ev e
   case r :: Either SomeException Val of
     Left _ -> success

@@ -29,7 +29,7 @@ main = do
     input <- readFile $ head args
     case jsExp input of
       Right e -> do
-        putStrLn $ "evalS -> " ++ show (evalState (evalS e) [])
+        putStrLn $ "evalS -> " ++ prettyVal (evalState (evalS e) [])
       Left err ->
         putStrLn $ show err
 
@@ -43,7 +43,7 @@ readEvalPrintLoop store = do
         Right Quit -> return ()
         Right (Eval e)  -> do
           let (v, store') = runState (evalS e) store
-          outputStrLn $ "evalS -> " ++ show v
+          outputStrLn $ "evalS -> " ++ prettyVal v
           readEvalPrintLoop store'
         Left err -> do
           outputStrLn $ show err

@@ -20,9 +20,10 @@ data Exp = Unary UOp Exp         {- A unary operation -}
          | Var String            {- variables -}
          | Assign String Exp     {- assignment -}
          | Seq Exp Exp           {- e1; e2 -}
+         deriving Show
 
 data Val = VNum Double | VBool Bool | VUndefined
-  deriving (Generic, NFData)
+  deriving (Generic, NFData, Show)
 
 isCloseEnough :: Double -> Double -> Bool
 isCloseEnough x y = abs (x - y) / x < 0.001
@@ -94,43 +95,43 @@ parseJs (JSUnaryExpression (JSUnaryOpPlus _) e) = do { t <- parseJs e; return $ 
 parseJs e = Left $ "Cannot parse complex JS expression"
 
 -- A simple pretty-printer for Exps
-instance Show Val where
-  show (VNum n) = show n
-  show (VBool True) = "true"
-  show (VBool False) = "false"
-  show (VUndefined) = "undefined"
+prettyVal :: Val -> String
+prettyVal (VNum n) = show n
+prettyVal (VBool True) = "true"
+prettyVal (VBool False) = "false"
+prettyVal (VUndefined) = "undefined"
 
-instance Show Exp where
-  show (Lit v) = show v
-  show e @ (Bin Add e1 e2) = (paren e1) ++ " + " ++ (paren e2)
-  show e @ (Bin Sub e1 e2) = (paren e1) ++ " - " ++ (paren e2)
-  show e @ (Bin Mul e1 e2) = (paren e1) ++ " * " ++ (paren e2)
-  show e @ (Bin Div e1 e2) = (paren e1) ++ " / " ++ (paren e2)
-  show e @ (Bin Mod e1 e2) = (paren e1) ++ " % " ++ (paren e2)
-  show e @ (Bin And e1 e2) = (paren e1) ++ " && " ++ (paren e2)
-  show e @ (Bin Or e1 e2) = (paren e1) ++ " || " ++ (paren e2)
-  show e @ (Bin Gt e1 e2) = (paren e1) ++ " > " ++ (paren e2)
-  show e @ (Bin Lt e1 e2) = (paren e1) ++ " < " ++ (paren e2)
-  show e @ (Bin Ge e1 e2) = (paren e1) ++ " >= " ++ (paren e2)
-  show e @ (Bin Le e1 e2) = (paren e1) ++ " <= " ++ (paren e2)
-  show e @ (Bin Eq e1 e2) = (paren e1) ++ " == " ++ (paren e2)
-  show e @ (Bin Ne e1 e2) = (paren e1) ++ " != " ++ (paren e2)
-  show e @ (Bin SEq e1 e2) = (paren e1) ++ " === " ++ (paren e2)
-  show e @ (Bin SNe e1 e2) = (paren e1) ++ " !== " ++ (paren e2)
-  show (Cond c t e) = (paren c) ++ " ? " ++ (paren t) ++ " : " ++ (paren e)
-  show (Unary Plus e@(Unary Plus _)) = "+(" ++ show e ++ ")"
-  show (Unary Minus e@(Unary Minus _)) = "-(" ++ show e ++ ")"
-  show (Unary Minus (Lit (VNum n))) | n < 0 = "-(" ++ show n ++ ")"
-  show (Unary Plus e) = "+" ++ (paren e)
-  show (Unary Minus e) = "-" ++ (paren e)
-  show (Unary Not e) = "!" ++ (paren e)
-  show (Var x) = x
-  show (Assign x e) = x ++ " = " ++ show e
-  show (Seq e1 e2) = show e1 ++ ", " ++ show e2
+pretty :: Exp -> String
+pretty (Lit v) = prettyVal v
+pretty e @ (Bin Add e1 e2) = (paren e1) ++ " + " ++ (paren e2)
+pretty e @ (Bin Sub e1 e2) = (paren e1) ++ " - " ++ (paren e2)
+pretty e @ (Bin Mul e1 e2) = (paren e1) ++ " * " ++ (paren e2)
+pretty e @ (Bin Div e1 e2) = (paren e1) ++ " / " ++ (paren e2)
+pretty e @ (Bin Mod e1 e2) = (paren e1) ++ " % " ++ (paren e2)
+pretty e @ (Bin And e1 e2) = (paren e1) ++ " && " ++ (paren e2)
+pretty e @ (Bin Or e1 e2) = (paren e1) ++ " || " ++ (paren e2)
+pretty e @ (Bin Gt e1 e2) = (paren e1) ++ " > " ++ (paren e2)
+pretty e @ (Bin Lt e1 e2) = (paren e1) ++ " < " ++ (paren e2)
+pretty e @ (Bin Ge e1 e2) = (paren e1) ++ " >= " ++ (paren e2)
+pretty e @ (Bin Le e1 e2) = (paren e1) ++ " <= " ++ (paren e2)
+pretty e @ (Bin Eq e1 e2) = (paren e1) ++ " == " ++ (paren e2)
+pretty e @ (Bin Ne e1 e2) = (paren e1) ++ " != " ++ (paren e2)
+pretty e @ (Bin SEq e1 e2) = (paren e1) ++ " === " ++ (paren e2)
+pretty e @ (Bin SNe e1 e2) = (paren e1) ++ " !== " ++ (paren e2)
+pretty (Cond c t e) = (paren c) ++ " ? " ++ (paren t) ++ " : " ++ (paren e)
+pretty (Unary Plus e@(Unary Plus _)) = "+(" ++ pretty e ++ ")"
+pretty (Unary Minus e@(Unary Minus _)) = "-(" ++ pretty e ++ ")"
+pretty (Unary Minus (Lit (VNum n))) | n < 0 = "-(" ++ show n ++ ")"
+pretty (Unary Plus e) = "+" ++ (paren e)
+pretty (Unary Minus e) = "-" ++ paren e
+pretty (Unary Not e) = "!" ++ (paren e)
+pretty (Var x) = x
+pretty (Assign x e) = x ++ " = " ++ paren e
+pretty (Seq e1 e2) = paren e1 ++ ", " ++ paren e2
 
 paren :: Exp -> String
-paren e @ (Bin _ _ _) = "(" ++ show e ++ ")"
-paren e@Assign{} = "(" ++ show e ++ ")"
-paren e@Seq{} = "(" ++ show e ++ ")"
-paren e@Cond{} = "(" ++ show e ++ ")"
-paren e @ _           = show e
+paren e @ (Bin _ _ _) = "(" ++ pretty e ++ ")"
+paren e@Assign{} = "(" ++ pretty e ++ ")"
+paren e@Seq{} = "(" ++ pretty e ++ ")"
+paren e@Cond{} = "(" ++ pretty e ++ ")"
+paren e @ _           = pretty e

@@ -16,7 +16,7 @@ runWith p args input = readProcess p args input
 
 runInNode :: Exp -> IO (Either String Val)
 runInNode e = do
-  s <- runWith "node" ["-p"] $ show e
+  s <- runWith "node" ["-p"] $ pretty e
   case lines s of
     [l] -> case parseVal l of
       Nothing -> return $ Left s
