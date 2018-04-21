@@ -42,6 +42,8 @@ testsForImplementation ev =
       , agreesWithNode ev genSeqArithNoMod)
     , ( "detects used undefined variable in arith (no division)"
       , detectsBadVar ev genSeqBadArithNoDiv)
+    , ( "detects used undefined variable in 'safe' (no lazy operations) expressions"
+      , detectsBadVar ev genSeqSafeBad)
     , ( "arith (no division) with inline assignment"
       , agreesWithNode ev genExpNoDiv)
     , ( "'safe' (no mod and funny values) expressions"

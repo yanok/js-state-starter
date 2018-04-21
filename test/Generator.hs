@@ -183,6 +183,23 @@ genBadExp' = do
     , Seq <$> genExp' <*> genBadExp'
     ]
 
+-- avoid Mod, Div, SEq and SNe
+genSafeSimpleBadExp :: MonadGen m => String -> Set String -> m Exp
+genSafeSimpleBadExp bad vs = do
+  Gen.recursive Gen.choice
+    [ return $ Var bad ]
+    [ Unary <$> Gen.enumBounded <*> genSimpleBadExp bad vs
+    , do
+        op <- Gen.filter (not . (`elem` [Mod, Div, SEq, SNe])) Gen.enumBounded
+        e1 <- genSafeSimpleBadExp bad vs
+        e2 <- genArithExp vs
+        return $ Bin op e1 e2
+    , do
+        c <- genSafeSimpleBadExp bad vs
+        e1 <- genArithExp vs
+        e2 <- genArithExp vs
+        return $ Cond c e1 e2
+    ]
 genSimpleBadExp :: MonadGen m => String -> Set String -> m Exp
 genSimpleBadExp bad vs = do
   Gen.recursive Gen.choice
@@ -302,6 +319,9 @@ genSeqArithNoDiv = genSeqExp Set.empty genArithExpNoDiv
 
 genSeqBadVar :: MonadGen m => m Exp
 genSeqBadVar = genSeqExpErr "bad_var" Set.empty genSimpleBadExp genArithExp
+
+genSeqSafeBad :: MonadGen m => m Exp
+genSeqSafeBad = genSeqExpErr "bad_var" Set.empty genSafeSimpleBadExp genArithExp
 
 genSeqBadArith :: MonadGen m => m Exp
 genSeqBadArith = genSeqExpErr "bad_var" Set.empty genArithBadExp genArithExp
