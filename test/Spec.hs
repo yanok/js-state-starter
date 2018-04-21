@@ -35,7 +35,7 @@ detectsBadVar ev gen = property $ do
 
 testsForImplementation :: (Exp -> Val) -> [Group]
 testsForImplementation ev =
-  [ Group "basic tests for over-simplified expressions"
+  [ Group "basic tests for (over)simplified expressions"
     [ ( "simple arith expression (no division) with no inline assignment"
       , agreesWithNode ev genSeqArithNoDiv)
     , ( "simple arith expression (no modulo) with no inline assignment"
@@ -44,6 +44,8 @@ testsForImplementation ev =
       , detectsBadVar ev genSeqBadArithNoDiv)
     , ( "arith (no division) with inline assignment"
       , agreesWithNode ev genExpNoDiv)
+    , ( "'safe' (no mod and funny values) expressions"
+      , agreesWithNode ev genSafeExp)
     ]
   , Group "trickier expressions (mostly tests previous assignment)"
     [ ( "arith-only expression with no inline assignment"

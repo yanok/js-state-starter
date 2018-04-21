@@ -75,6 +75,39 @@ genExp' = do
     , Seq <$> genExp' <*> genExp'
     ]
 
+-- avoid common problems: modulo and funny values
+genSafeExp :: MonadGen m => m Exp
+genSafeExp = evalStateT genSafeExp' Set.empty
+
+genSafeExp' :: MonadGen m => StateT (Set String) m Exp
+genSafeExp' = do
+  vs <- get
+  Gen.recursive Gen.choice
+    [ genLeaf vs (Gen.choice [genNumVal, genBoolVal]) ]
+    [ Unary <$> Gen.enumBounded <*> genSafeExp'
+    , do
+        op <- Gen.filter (/= Mod) Gen.enumBounded
+        e1 <- genSafeExp'
+        old <- get
+        e2 <- genSafeExp'
+        when (isShortCircuit op) $ put old
+        return $ Bin op e1 e2
+    , do
+        c <- genSafeExp'
+        old <- get
+        e1 <- genSafeExp'
+        put old
+        e2 <- genSafeExp'
+        put old
+        return $ Cond c e1 e2
+    , do
+        v <- genVarName
+        e <- genSafeExp'
+        put $ Set.insert v vs
+        return $ Assign v e
+    , Seq <$> genSafeExp' <*> genSafeExp'
+    ]
+
 genExpNoDiv :: MonadGen m => m Exp
 genExpNoDiv = evalStateT genExpNoDiv' Set.empty
 
