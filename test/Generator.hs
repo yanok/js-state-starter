@@ -83,15 +83,15 @@ genExpNoDiv' = do
   vs <- get
   Gen.recursive Gen.choice
     [ genLeaf vs genNumVal ]
-    [ Gen.subterm2 genExpNoDiv' genExpNoDiv' (Bin Add)
-    , Gen.subterm2 genExpNoDiv' genExpNoDiv' (Bin Sub)
-    , Gen.subterm2 genExpNoDiv' genExpNoDiv' (Bin Mul)
+    [ Bin Add <$> genExpNoDiv' <*> genExpNoDiv'
+    , Bin Sub <$> genExpNoDiv' <*> genExpNoDiv'
+    , Bin Mul <$> genExpNoDiv' <*> genExpNoDiv'
     , do
         v <- genVarName
         e <- genExpNoDiv'
         put $ Set.insert v vs
         return $ Assign v e
-    , Gen.subterm2 genExpNoDiv' genExpNoDiv' Seq
+    , Seq <$> genExpNoDiv' <*> genExpNoDiv'
     ]
 
 genBadExp :: MonadGen m => m Exp
