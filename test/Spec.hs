@@ -38,15 +38,15 @@ testsForImplementation ev =
   [ Group "basic tests for over-simplified expressions"
     [ ( "simple arith expression (no division) with no inline assignment"
       , agreesWithNode ev genSeqArithNoDiv)
+    , ( "simple arith expression (no modulo) with no inline assignment"
+      , agreesWithNode ev genSeqArithNoMod)
     , ( "detects used undefined variable in arith (no division)"
       , detectsBadVar ev genSeqBadArithNoDiv)
     , ( "arith (no division) with inline assignment"
       , agreesWithNode ev genExpNoDiv)
     ]
   , Group "trickier expressions (mostly tests previous assignment)"
-    [ ( "simple arith expression (no modulo) with no inline assignment"
-      , agreesWithNode ev genSeqArithNoMod)
-    , ( "arith-only expression with no inline assignment"
+    [ ( "arith-only expression with no inline assignment"
       , agreesWithNode ev genSeqArith)
     , ( "general expressions"
       , agreesWithNode ev genExp)
