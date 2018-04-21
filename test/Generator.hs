@@ -188,7 +188,7 @@ genSafeSimpleBadExp :: MonadGen m => String -> Set String -> m Exp
 genSafeSimpleBadExp bad vs = do
   Gen.recursive Gen.choice
     [ return $ Var bad ]
-    [ Unary <$> Gen.enumBounded <*> genSimpleBadExp bad vs
+    [ Unary <$> Gen.enumBounded <*> genSafeSimpleBadExp bad vs
     , do
         op <- Gen.filter (not . (`elem` [Mod, Div, SEq, SNe])) Gen.enumBounded
         e1 <- genSafeSimpleBadExp bad vs
@@ -200,6 +200,7 @@ genSafeSimpleBadExp bad vs = do
         e2 <- genArithExp vs
         return $ Cond c e1 e2
     ]
+
 genSimpleBadExp :: MonadGen m => String -> Set String -> m Exp
 genSimpleBadExp bad vs = do
   Gen.recursive Gen.choice
