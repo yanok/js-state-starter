@@ -75,6 +75,25 @@ genExp' = do
     , Seq <$> genExp' <*> genExp'
     ]
 
+genExpNoDiv :: MonadGen m => m Exp
+genExpNoDiv = evalStateT genExpNoDiv' Set.empty
+
+genExpNoDiv' :: MonadGen m => StateT (Set String) m Exp
+genExpNoDiv' = do
+  vs <- get
+  Gen.recursive Gen.choice
+    [ genLeaf vs genNumVal ]
+    [ Gen.subterm2 genExpNoDiv' genExpNoDiv' (Bin Add)
+    , Gen.subterm2 genExpNoDiv' genExpNoDiv' (Bin Sub)
+    , Gen.subterm2 genExpNoDiv' genExpNoDiv' (Bin Mul)
+    , do
+        v <- genVarName
+        e <- genExpNoDiv'
+        put $ Set.insert v vs
+        return $ Assign v e
+    , Gen.subterm2 genExpNoDiv' genExpNoDiv' Seq
+    ]
+
 genBadExp :: MonadGen m => m Exp
 genBadExp = evalStateT genBadExp' Set.empty
 

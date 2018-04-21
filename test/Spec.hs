@@ -38,6 +38,8 @@ testsForImplementation ev =
       , agreesWithNode ev genSeqArithNoDiv)
     , ( "detects used undefined variable in arith (no division)"
       , detectsBadVar ev genSeqBadArithNoDiv)
+    , ( "arith (no division) with inline assignment"
+      , agreesWithNode ev genExpNoDiv)
     ]
   , Group "trickier expressions (mostly tests previous assignment)"
     [ ( "simple arith expression (no modulo) with no inline assignment"
