@@ -49,6 +49,16 @@ testsForImplementation ev =
     , ( "'safe' (no mod and funny values) expressions"
       , agreesWithNode ev genSafeExp)
     ]
+  , Group "short circuiting operations"
+    [ ( "and false"
+      , detectsBadVar ev genSCAnd)
+    , ( "or true"
+      , detectsBadVar ev genSCOr)
+    , ( "cond true"
+      , detectsBadVar ev genSCCondT)
+    , ( "cond false"
+      , detectsBadVar ev genSCCondF)
+    ]
   , Group "trickier expressions (mostly tests previous assignment)"
     [ ( "arith-only expression with no inline assignment"
       , agreesWithNode ev genSeqArith)

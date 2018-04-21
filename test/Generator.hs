@@ -329,3 +329,57 @@ genSeqBadArith = genSeqExpErr "bad_var" Set.empty genArithBadExp genArithExp
 genSeqBadArithNoDiv :: MonadGen m => m Exp
 genSeqBadArithNoDiv
   = genSeqExpErr "bad_var" Set.empty genArithBadExpNoDiv genArithExpNoDiv
+
+genFalsy :: MonadGen m => m Exp
+genFalsy = Gen.recursive Gen.choice
+  [ pure $ Lit $ VBool False
+  , pure $ Lit $ VNum 0
+  ]
+  [ Bin And <$> genFalsy <*> genArithExp Set.empty
+  , Bin And <$> genArithExp Set.empty <*> genFalsy
+  , Gen.subterm2 genFalsy genFalsy (Bin Or)
+  ]
+
+genTruthy :: MonadGen m => m Exp
+genTruthy = Gen.recursive Gen.choice
+  [ pure $ Lit $ VBool True
+  , pure $ Lit $ VNum 1
+  ]
+  [ Bin Or <$> genTruthy <*> genArithExp Set.empty
+  , Bin Or <$> genArithExp Set.empty <*> genTruthy
+  , Gen.subterm2 genTruthy genTruthy (Bin And)
+  ]
+
+genSCAnd :: MonadGen m => m Exp
+genSCAnd = do
+  v <- genVarName
+  e <- genExp
+  c <- genFalsy
+  e2 <- genSafeSimpleBadExp v Set.empty
+  return $ Seq (Bin And c (Assign v e)) e2
+
+genSCOr :: MonadGen m => m Exp
+genSCOr = do
+  v <- genVarName
+  e <- genExp
+  c <- genTruthy
+  e2 <- genSafeSimpleBadExp v Set.empty
+  return $ Seq (Bin Or c (Assign v e)) e2
+
+genSCCondT :: MonadGen m => m Exp
+genSCCondT = do
+  v <- genVarName
+  e <- genExp
+  c <- genTruthy
+  e2 <- genArithExp Set.empty
+  e3 <- genSafeSimpleBadExp v Set.empty
+  return $ Seq (Cond c e2 (Assign v e)) e3
+
+genSCCondF :: MonadGen m => m Exp
+genSCCondF = do
+  v <- genVarName
+  e <- genExp
+  c <- genFalsy
+  e2 <- genArithExp Set.empty
+  e3 <- genSafeSimpleBadExp v Set.empty
+  return $ Seq (Cond c (Assign v e) e2) e3
