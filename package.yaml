@@ -47,8 +47,20 @@ executables:
 
 tests:
   jsexp-spec:
-    main:                Spec
-    other-modules:       Run, Generator, Eval, EvalS, JS
+    main:                SpecEval
+    other-modules:       Run, Generator, Eval, JS, Spec
+    source-dirs:
+    - src
+    - test
+    dependencies:
+    - hedgehog
+    - containers
+    - process
+    - deepseq
+
+  jsexpS-spec:
+    main:                SpecEvalS
+    other-modules:       Run, Generator, EvalS, JS, Spec
     source-dirs:
     - src
     - test
