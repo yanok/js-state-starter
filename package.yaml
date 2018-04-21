@@ -60,7 +60,7 @@ tests:
 
   jsexpS-spec:
     main:                SpecEvalS
-    other-modules:       Run, Generator, EvalS, JS, Spec
+    other-modules:       Run, Generator, Eval, EvalS, JS, Spec
     source-dirs:
     - src
     - test
