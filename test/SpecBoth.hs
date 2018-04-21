@@ -24,7 +24,7 @@ evalS e = evalState (EvalS.evalS e) []
 implementationsAgree :: H.Group
 implementationsAgree = H.Group "tests for both eval and evalS"
   [ ( "evalS agrees with eval"
-    , H.withTests 1000 $ H.property $ do
+    , H.withTests 100000 $ H.property $ do
         e <- H.forAll genExp
         H.annotate $ pretty e
         r :: Either SomeException Val <- liftIO $ try $ evaluate $ force $ eval e
