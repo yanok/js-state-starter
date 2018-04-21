@@ -1,17 +1,19 @@
+{-# LANGUAGE DeriveDataTypeable #-}
 {-# LANGUAGE DeriveAnyClass #-}
 {-# LANGUAGE DeriveGeneric  #-}
 module JS where
 
 import           Control.Applicative               ((<$>), (<*>))
 import           Control.DeepSeq
+import           Data.Data
 import           GHC.Generics
 import           Language.JavaScript.Parser.AST
 import           Language.JavaScript.Parser.Parser
 
 data Op = Add | Sub | Mul | Div | Mod | Gt | Lt | Eq | Le | Ge | And | Or | SEq | Ne | SNe
-  deriving (Show, Eq, Enum, Bounded)
+  deriving (Show, Eq, Enum, Bounded, Data)
 
-data UOp = Plus | Minus | Not deriving (Show, Eq, Enum, Bounded)
+data UOp = Plus | Minus | Not deriving (Show, Eq, Enum, Bounded, Data)
 
 data Exp = Unary UOp Exp         {- A unary operation -}
          | Bin Op Exp Exp        {- A binary operation -}
@@ -20,10 +22,10 @@ data Exp = Unary UOp Exp         {- A unary operation -}
          | Var String            {- variables -}
          | Assign String Exp     {- assignment -}
          | Seq Exp Exp           {- e1; e2 -}
-         deriving Show
+         deriving (Show, Eq, Data)
 
 data Val = VNum Double | VBool Bool | VUndefined
-  deriving (Generic, NFData, Show)
+  deriving (Generic, NFData, Show, Data)
 
 isCloseEnough :: Double -> Double -> Bool
 isCloseEnough x y = abs (x - y) / x < 0.001

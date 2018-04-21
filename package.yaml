@@ -46,6 +46,18 @@ executables:
     - -with-rtsopts=-N
 
 tests:
+  pretty:
+    main:                PrettyTest
+    other-modules:       Generator, JS
+    source-dirs:
+    - src
+    - test
+    dependencies:
+    - hedgehog
+    - containers
+    - deepseq
+    - uniplate
+
   jsexp-spec:
     main:                SpecEval
     other-modules:       Run, Generator, Eval, JS, Spec
