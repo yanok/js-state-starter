@@ -8,6 +8,7 @@ import           Control.Monad
 import           Control.Monad.State
 import qualified Hedgehog            as H
 import           System.Exit
+import           System.IO
 
 import qualified Eval
 import qualified EvalS
@@ -38,5 +39,7 @@ implementationsAgree = H.Group "tests for both eval and evalS"
 
 main :: IO ()
 main = do
+  hSetEncoding stdout utf8
+  hSetEncoding stderr utf8
   r <- H.checkSequential implementationsAgree
   unless r $ exitFailure
