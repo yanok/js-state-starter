@@ -392,3 +392,11 @@ genAssignAssign = do
   e <- genArithExpNoMod Set.empty
   e2 <- genArithBadExpNoDiv v2 Set.empty
   return $ Seq (Assign v1 (Assign v2 e)) e2
+
+genBinopAssign :: MonadGen m => (Op -> Bool) -> m Exp
+genBinopAssign p = do
+  v <- genVarName
+  e <- genArithExpNoMod Set.empty
+  op <- Gen.filter p Gen.enumBounded
+  e2 <- genArithBadExpNoDiv v Set.empty
+  return $ Bin op (Assign v e) e2

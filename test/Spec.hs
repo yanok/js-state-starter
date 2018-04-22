@@ -46,6 +46,8 @@ testsForImplementation ev =
       , detectsBadVar ev genSeqSafeBad)
     , ( "assignment inside assignment"
       , agreesWithNode ev genAssignAssign)
+    , ( "assignment inside binary operator"
+      , agreesWithNode ev $ genBinopAssign (/= Mod))
     , ( "arith (no division) with inline assignment"
       , agreesWithNode ev genExpNoDiv)
     , ( "'safe' (no mod and funny values) expressions"
