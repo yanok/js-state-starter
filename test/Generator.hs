@@ -384,3 +384,11 @@ genSCCondF = do
   e2 <- genArithExp Set.empty
   e3 <- genSafeSimpleBadExp v Set.empty
   return $ Seq (Cond c (Assign v e) e2) e3
+
+genAssignAssign :: MonadGen m => m Exp
+genAssignAssign = do
+  v1 <- genVarName
+  v2 <- Gen.filter (/= v1) genVarName
+  e <- genArithExp Set.empty
+  e2 <- genArithBadExpNoDiv v2 Set.empty
+  return $ Seq (Assign v1 (Assign v2 e)) e2
