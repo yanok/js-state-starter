@@ -21,6 +21,16 @@ eval e = fst $ Eval.eval e []
 evalS :: Exp -> Val
 evalS e = evalState (EvalS.evalS e) []
 
+newtype TVal = T Val
+
+instance Show TVal where
+  show (T v) = show v
+
+-- override equality for NaN
+instance Eq TVal where
+  T (VNum n) == T (VNum m) | isNaN n = isNaN m
+  T v1 == T v2 = v1 == v2
+
 implementationsAgree :: H.Group
 implementationsAgree = H.Group "tests for both eval and evalS"
   [ ( "evalS agrees with eval"
@@ -33,7 +43,7 @@ implementationsAgree = H.Group "tests for both eval and evalS"
         H.annotateShow rS
         case (r,rS) of
           (Left _, Left _) -> H.success
-          (Right v, Right vS) -> v H.=== vS
+          (Right v, Right vS) -> T v H.=== T vS
           _ -> H.failure)
   ]
 
