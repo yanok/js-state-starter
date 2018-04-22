@@ -389,6 +389,6 @@ genAssignAssign :: MonadGen m => m Exp
 genAssignAssign = do
   v1 <- genVarName
   v2 <- Gen.filter (/= v1) genVarName
-  e <- genArithExp Set.empty
+  e <- genArithExpNoMod Set.empty
   e2 <- genArithBadExpNoDiv v2 Set.empty
   return $ Seq (Assign v1 (Assign v2 e)) e2
