@@ -15,6 +15,23 @@ import           Generator
 import           JS
 import           Run
 
+newtype TVal = T Val
+
+instance Show TVal where
+  show (T v) = show v
+
+isCloseEnough :: Double -> Double -> Bool
+isCloseEnough x y = abs (x - y) / x < 0.001
+
+instance Eq TVal where
+  T (VNum n) == T (VNum m) | isNaN n      = isNaN m
+                           | isInfinite n = isInfinite m && signum n == signum m
+                           | abs n == 0   = n == m
+                           | otherwise    = isCloseEnough n m
+  T (VBool b1) == T (VBool b2) = b1 == b2
+  T VUndefined == T VUndefined = True
+  _ == _ = False
+
 agreesWithNode :: (Exp -> Val) -> Gen Exp -> Property
 agreesWithNode ev gen = H.withTests 300 $ property $ do
   e <- forAll gen
@@ -22,7 +39,7 @@ agreesWithNode ev gen = H.withTests 300 $ property $ do
   rN <- evalIO $ runInNode e
   vN <- evalEither rN
   v <- H.eval $ ev e
-  v === vN
+  T v === T vN
 
 detectsBadVar :: (Exp -> Val) -> Gen Exp -> Property
 detectsBadVar ev gen = H.withTests 1000 $ property $ do

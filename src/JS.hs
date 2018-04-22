@@ -23,19 +23,7 @@ data Exp = Unary UOp Exp         {- A unary operation -}
          deriving Show
 
 data Val = VNum Double | VBool Bool | VUndefined
-  deriving (Generic, NFData, Show)
-
-isCloseEnough :: Double -> Double -> Bool
-isCloseEnough x y = abs (x - y) / x < 0.001
-
-instance Eq Val where
-  VNum n == VNum m | isNaN n      = isNaN m
-                   | isInfinite n = isInfinite m && signum n == signum m
-                   | abs n == 0   = n == m
-                   | otherwise    = isCloseEnough n m
-  VBool b1 == VBool b2 = b1 == b2
-  VUndefined == VUndefined = True
-  _ == _ = False
+  deriving (Generic, NFData, Show, Eq)
 
 type Store = [(String,Val)]
 
