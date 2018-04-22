@@ -34,7 +34,7 @@ instance Eq TVal where
 implementationsAgree :: H.Group
 implementationsAgree = H.Group "tests for both eval and evalS"
   [ ( "evalS agrees with eval"
-    , H.withTests 100000 $ H.property $ do
+    , H.withTests 10000 $ H.property $ do
         e <- H.forAll genExp
         H.annotate $ pretty e
         r :: Either SomeException Val <- liftIO $ try $ evaluate $ force $ eval e
